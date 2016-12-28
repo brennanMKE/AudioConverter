@@ -3,7 +3,7 @@
 Integrates with LAME library to support converting audio to MP3 format
 in addition to the formats supported by iOS.
 
- * [ExtAudioFileConverter] (Original Source)
+ * [ExtAudioFileConverter]
  * [LAME iOS Build]
 
 # How to Build
