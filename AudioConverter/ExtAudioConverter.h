@@ -34,6 +34,8 @@ enum BitDepth{
 @property (nonatomic,assign) AudioFormatID outputFormatID; // Default Linear PCM
 @property (nonatomic,assign) AudioFileTypeID outputFileType; // Default kAudioFileCAFType
 
+@property (nonatomic,assign) BOOL debugEnabled;
+
 - (BOOL)convert;
 
 @end

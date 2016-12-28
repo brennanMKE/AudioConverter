@@ -9,6 +9,11 @@
 #import "ExtAudioConverter.h"
 #import "lame.h"
 
+typedef NS_ENUM(UInt32, ExtAudioConverterStatus) {
+    ExtAudioConverterStatusOK = 0,
+    ExtAudioConverterStatusFailed
+};
+
 typedef struct ExtAudioConverterSettings {
     AudioStreamBasicDescription   inputPCMFormat;
     AudioStreamBasicDescription   outputFormat;
@@ -20,26 +25,28 @@ typedef struct ExtAudioConverterSettings {
     AudioStreamPacketDescription *inputPacketDescriptions;
 } ExtAudioConverterSettings;
 
-static void CheckError(OSStatus error, const char *operation) {
-    if (error == noErr) return;
-    char errorString[20];
+static ExtAudioConverterStatus CheckStatus(OSStatus status, const char *operation) {
+    if (status == noErr) return ExtAudioConverterStatusOK;
+    char statusString[20];
     // See if it appears to be a 4-char-code
-    *(UInt32 *)(errorString + 1) = CFSwapInt32HostToBig(error);
-    if (isprint(errorString[1]) && isprint(errorString[2]) &&
-        isprint(errorString[3]) && isprint(errorString[4])) {
-        errorString[0] = errorString[5] = '\'';
-        errorString[6] = '\0';
+    *(UInt32 *)(statusString + 1) = CFSwapInt32HostToBig(status);
+    if (isprint(statusString[1]) && isprint(statusString[2]) &&
+        isprint(statusString[3]) && isprint(statusString[4])) {
+        statusString[0] = statusString[5] = '\'';
+        statusString[6] = '\0';
     } else {
         // No, format it as an integer
-        sprintf(errorString, "%d", (int)error);
+        sprintf(statusString, "%d", (int)status);
     }
-    fprintf(stderr, "Error: %s (%s)\n", operation, errorString);
-    exit(1);
+    fprintf(stderr, "Error: %s (%s)\n", operation, statusString);
+
+    return ExtAudioConverterStatusFailed;
 }
 
-void startConvert(ExtAudioConverterSettings *settings) {
+Boolean startConvert(ExtAudioConverterSettings *settings) {
     //Determine the proper buffer size and calculate number of packets per buffer
     //for CBR and VBR format
+    ExtAudioConverterStatus status;
     UInt32 sizePerBuffer = 32*1024; //32KB is a good starting point
     UInt32 framesPerBuffer = sizePerBuffer/sizeof(SInt16);
 
@@ -55,23 +62,32 @@ void startConvert(ExtAudioConverterSettings *settings) {
 
         UInt32 framesCount = framesPerBuffer;
 
-        CheckError(ExtAudioFileRead(settings->inputFile,
-                                    &framesCount,
-                                    &outputBufferList),
-                   "ExtAudioFileRead failed");
-
-        if (framesCount==0) {
-            return;
+        status = CheckStatus(ExtAudioFileRead(settings->inputFile,
+                                             &framesCount,
+                                             &outputBufferList),
+                            "ExtAudioFileRead failed");
+        if (status != ExtAudioConverterStatusOK) {
+            return false;
         }
 
-        CheckError(ExtAudioFileWrite(settings->outputFile,
-                                     framesCount,
-                                     &outputBufferList),
-                   "ExtAudioFileWrite failed");
+        if (framesCount==0) {
+            return true;
+        }
+
+        status = CheckStatus(ExtAudioFileWrite(settings->outputFile,
+                                              framesCount,
+                                              &outputBufferList),
+                            "ExtAudioFileWrite failed");
+        if (status != ExtAudioConverterStatusOK) {
+            return false;
+        }
     }
+
+    return true;
 }
 
-void startConvertMP3(ExtAudioConverterSettings *settings) {
+Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
+    ExtAudioConverterStatus status;
     //Init lame and set parameters
     lame_t lame = lame_init();
     lame_set_in_samplerate(lame, settings->inputPCMFormat.mSampleRate);
@@ -102,10 +118,13 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
 
         framesCount = framesPerBuffer;
 
-        CheckError(ExtAudioFileRead(settings->inputFile,
-                                    &framesCount,
-                                    &outputBufferList),
-                   "ExtAudioFileRead failed");
+        status = CheckStatus(ExtAudioFileRead(settings->inputFile,
+                                             &framesCount,
+                                             &outputBufferList),
+                            "ExtAudioFileRead failed");
+        if (status != ExtAudioConverterStatusOK) {
+            return false;
+        }
 
         // Copy bytes from outputBufferList into pcm_buffer
         SInt16 pcm_buffer[framesCount];
@@ -140,29 +159,39 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
 
     lame_close(lame);
     fclose(outputFile);
+
+    return true;
 }
 
 @implementation ExtAudioConverter
 
 - (BOOL)convert {
+    ExtAudioConverterStatus status;
     ExtAudioConverterSettings settings = {0};
 
     //Check if source file or output file is null
     if (self.inputFilePath==NULL) {
-        NSLog(@"Source file is not set");
+        if (self.debugEnabled) {
+            NSLog(@"Source file is not set");
+        }
         return NO;
     }
 
     if (self.outputFilePath==NULL) {
-        NSLog(@"Output file is no set");
+        if (self.debugEnabled) {
+            NSLog(@"Output file is no set");
+        }
         return NO;
     }
 
     //Create ExtAudioFileRef
     NSURL *sourceURL = [NSURL fileURLWithPath:self.inputFilePath];
-    CheckError(ExtAudioFileOpenURL((__bridge CFURLRef)sourceURL,
-                                   &settings.inputFile),
-               "ExtAudioFileOpenURL failed");
+    status = CheckStatus(ExtAudioFileOpenURL((__bridge CFURLRef)sourceURL,
+                                            &settings.inputFile),
+                        "ExtAudioFileOpenURL failed");
+    if (status != ExtAudioConverterStatusOK) {
+        return false;
+    }
 
     if (![self validateInput:&settings]) {
         return NO;
@@ -187,14 +216,19 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
         }
     } else {
         UInt32 size = sizeof(settings.outputFormat);
-        CheckError(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo,
-                                          0,
-                                          NULL,
-                                          &size,
-                                          &settings.outputFormat),
-                   "AudioFormatGetProperty kAudioFormatProperty_FormatInfo failed");
+        status = CheckStatus(AudioFormatGetProperty(kAudioFormatProperty_FormatInfo,
+                                                   0,
+                                                   NULL,
+                                                   &size,
+                                                   &settings.outputFormat),
+                            "AudioFormatGetProperty kAudioFormatProperty_FormatInfo failed");
+        if (status != ExtAudioConverterStatusOK) {
+            return false;
+        }
     }
-    NSLog(@"output format:%@", [self descriptionForAudioFormat:settings.outputFormat]);
+    if (self.debugEnabled) {
+        NSLog(@"output format:%@", [self descriptionForAudioFormat:settings.outputFormat]);
+    }
 
     //Create output file
     //if output file path is invalid, this returns an error with 'wht?'
@@ -203,13 +237,16 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
     //create output file
     settings.outputFilePath = (__bridge CFStringRef)(self.outputFilePath);
     if (settings.outputFormat.mFormatID!=kAudioFormatMPEGLayer3) {
-        CheckError(ExtAudioFileCreateWithURL((__bridge CFURLRef)outputURL,
-                                             self.outputFileType,
-                                             &settings.outputFormat,
-                                             NULL,
-                                             kAudioFileFlags_EraseFile,
-                                             &settings.outputFile),
-                   "Create output file failed, the output file type and output format pair may not match");
+        status = CheckStatus(ExtAudioFileCreateWithURL((__bridge CFURLRef)outputURL,
+                                                      self.outputFileType,
+                                                      &settings.outputFormat,
+                                                      NULL,
+                                                      kAudioFileFlags_EraseFile,
+                                                      &settings.outputFile),
+                            "Create output file failed, the output file type and output format pair may not match");
+        if (status != ExtAudioConverterStatusOK) {
+            return false;
+        }
     }
 
     //Set input file's client data format
@@ -228,26 +265,34 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
         settings.inputPCMFormat.mBytesPerPacket = settings.inputPCMFormat.mBytesPerFrame = settings.inputPCMFormat.mChannelsPerFrame*sizeof(SInt16);
         settings.inputPCMFormat.mFramesPerPacket = 1;
     }
-    NSLog(@"Client data format:%@",[self descriptionForAudioFormat:settings.inputPCMFormat]);
+    if (self.debugEnabled) {
+        NSLog(@"Client data format:%@",[self descriptionForAudioFormat:settings.inputPCMFormat]);
+    }
 
-    CheckError(ExtAudioFileSetProperty(settings.inputFile,
-                                       kExtAudioFileProperty_ClientDataFormat,
-                                       sizeof(settings.inputPCMFormat),
-                                       &settings.inputPCMFormat),
-               "Setting client data format of input file failed");
+    status = CheckStatus(ExtAudioFileSetProperty(settings.inputFile,
+                                                kExtAudioFileProperty_ClientDataFormat,
+                                                sizeof(settings.inputPCMFormat),
+                                                &settings.inputPCMFormat),
+                        "Setting client data format of input file failed");
+    if (status != ExtAudioConverterStatusOK) {
+        return false;
+    }
 
     //If the file has a client data format, then the audio data in ioData is translated from the client format to the file data format, via theExtAudioFile's internal AudioConverter.
     if (settings.outputFormat.mFormatID!=kAudioFormatMPEGLayer3) {
-        CheckError(ExtAudioFileSetProperty(settings.outputFile,
-                                           kExtAudioFileProperty_ClientDataFormat,
-                                           sizeof(settings.inputPCMFormat),
-                                           &settings.inputPCMFormat),
-                   "Setting client data format of output file failed");
+        status = CheckStatus(ExtAudioFileSetProperty(settings.outputFile,
+                                                    kExtAudioFileProperty_ClientDataFormat,
+                                                    sizeof(settings.inputPCMFormat),
+                                                    &settings.inputPCMFormat),
+                            "Setting client data format of output file failed");
+        if (status != ExtAudioConverterStatusOK) {
+            return false;
+        }
     }
 
     if (settings.outputFormat.mFormatID==kAudioFormatMPEGLayer3) {
         startConvertMP3(&settings);
-    }else{
+    } else {
         startConvert(&settings);
     }
 
@@ -417,7 +462,7 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
     { [description appendString:@"kAppleLosslessFormatFlag_24BitSourceData \n"]; }
     if (mFormatFlags & kAppleLosslessFormatFlag_32BitSourceData)
     { [description appendString:@"kAppleLosslessFormatFlag_32BitSourceData \n"]; }
-
+    
     return [NSString stringWithString:description];
 }
 
