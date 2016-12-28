@@ -91,6 +91,7 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
     SInt16 *outputBuffer = (SInt16 *)malloc(sizeof(SInt16) * sizePerBuffer);
 
     UInt32 framesCount;
+    UInt32 channelsCount = settings->outputFormat.mChannelsPerFrame;
 
     do {
         AudioBufferList outputBufferList;
@@ -113,7 +114,7 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
                outputBufferList.mBuffers[0].mData,
                framesCount);
 
-        if (framesCount > 0) {
+        if (framesCount < framesPerBuffer * channelsCount) {
             //the 3rd parameter means number of samples per channel, not number of sample in pcm_buffer
             write = lame_encode_buffer_interleaved(lame,
                                                    outputBufferList.mBuffers[0].mData,
@@ -122,9 +123,12 @@ void startConvertMP3(ExtAudioConverterSettings *settings) {
                                                    framesCount);
         }
         else {
-            // TODO: Use lame_encode_flush for end of file. It currently has a memory bug.
-            // write = lame_encode_flush(lame, mp3_buffer, 0);
-            write = 0;
+            if (framesCount > 0) {
+                write = lame_encode_flush(lame, mp3_buffer, framesCount);
+            }
+            else {
+                write = 0;
+            }
         }
 
         fwrite(mp3_buffer,
