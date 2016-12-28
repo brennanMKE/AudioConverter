@@ -98,7 +98,7 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
     NSString *outputFilePath = (__bridge NSString*)settings->outputFilePath;
     FILE *outputFile = fopen([outputFilePath cStringUsingEncoding:1], "wb");
 
-    UInt32 sizePerBuffer = 8192;
+    UInt32 sizePerBuffer = 32*1024;
     UInt32 framesPerBuffer = sizePerBuffer/sizeof(SInt16);
 
     int write;
