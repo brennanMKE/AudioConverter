@@ -92,7 +92,7 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
     lame_t lame = lame_init();
     lame_set_in_samplerate(lame, settings->inputPCMFormat.mSampleRate);
     lame_set_num_channels(lame, settings->inputPCMFormat.mChannelsPerFrame);
-    lame_set_VBR(lame, vbr_off);
+    lame_set_VBR(lame, vbr_default);
     lame_init_params(lame);
 
     NSString *outputFilePath = (__bridge NSString*)settings->outputFilePath;
