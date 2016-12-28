@@ -14,6 +14,9 @@
 		2655BBDA1E136782004D3039 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2655BBD91E136782004D3039 /* Assets.xcassets */; };
 		2655BBDD1E136782004D3039 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2655BBDB1E136782004D3039 /* LaunchScreen.storyboard */; };
 		2655BBE81E136783004D3039 /* AudioConverterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2655BBE71E136783004D3039 /* AudioConverterTests.m */; };
+		2655BBF81E1367A7004D3039 /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2655BBF71E1367A7004D3039 /* libmp3lame.a */; };
+		2655BBFB1E1367D3004D3039 /* ExtAudioConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2655BBFA1E1367D3004D3039 /* ExtAudioConverter.m */; };
+		2655BBFD1E1376F9004D3039 /* source.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2655BBFC1E1376F9004D3039 /* source.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +43,11 @@
 		2655BBE31E136783004D3039 /* AudioConverterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioConverterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2655BBE71E136783004D3039 /* AudioConverterTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioConverterTests.m; sourceTree = "<group>"; };
 		2655BBE91E136783004D3039 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2655BBF51E1367A7004D3039 /* lame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lame.h; sourceTree = "<group>"; };
+		2655BBF71E1367A7004D3039 /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmp3lame.a; sourceTree = "<group>"; };
+		2655BBF91E1367D3004D3039 /* ExtAudioConverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtAudioConverter.h; sourceTree = "<group>"; };
+		2655BBFA1E1367D3004D3039 /* ExtAudioConverter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtAudioConverter.m; sourceTree = "<group>"; };
+		2655BBFC1E1376F9004D3039 /* source.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = source.m4a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2655BBF81E1367A7004D3039 /* libmp3lame.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +90,11 @@
 		2655BBCC1E136782004D3039 /* AudioConverter */ = {
 			isa = PBXGroup;
 			children = (
+				2655BBF21E1367A7004D3039 /* lame */,
+				2655BBCD1E136782004D3039 /* Supporting Files */,
+				2655BBFC1E1376F9004D3039 /* source.m4a */,
+				2655BBF91E1367D3004D3039 /* ExtAudioConverter.h */,
+				2655BBFA1E1367D3004D3039 /* ExtAudioConverter.m */,
 				2655BBD01E136782004D3039 /* AppDelegate.h */,
 				2655BBD11E136782004D3039 /* AppDelegate.m */,
 				2655BBD31E136782004D3039 /* ViewController.h */,
@@ -89,7 +103,6 @@
 				2655BBD91E136782004D3039 /* Assets.xcassets */,
 				2655BBDB1E136782004D3039 /* LaunchScreen.storyboard */,
 				2655BBDE1E136782004D3039 /* Info.plist */,
-				2655BBCD1E136782004D3039 /* Supporting Files */,
 			);
 			path = AudioConverter;
 			sourceTree = "<group>";
@@ -109,6 +122,39 @@
 				2655BBE91E136783004D3039 /* Info.plist */,
 			);
 			path = AudioConverterTests;
+			sourceTree = "<group>";
+		};
+		2655BBF21E1367A7004D3039 /* lame */ = {
+			isa = PBXGroup;
+			children = (
+				2655BBF31E1367A7004D3039 /* include */,
+				2655BBF61E1367A7004D3039 /* lib */,
+			);
+			path = lame;
+			sourceTree = "<group>";
+		};
+		2655BBF31E1367A7004D3039 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				2655BBF41E1367A7004D3039 /* lame */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		2655BBF41E1367A7004D3039 /* lame */ = {
+			isa = PBXGroup;
+			children = (
+				2655BBF51E1367A7004D3039 /* lame.h */,
+			);
+			path = lame;
+			sourceTree = "<group>";
+		};
+		2655BBF61E1367A7004D3039 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				2655BBF71E1367A7004D3039 /* libmp3lame.a */,
+			);
+			path = lib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -198,6 +244,7 @@
 				2655BBDD1E136782004D3039 /* LaunchScreen.storyboard in Resources */,
 				2655BBDA1E136782004D3039 /* Assets.xcassets in Resources */,
 				2655BBD81E136782004D3039 /* Main.storyboard in Resources */,
+				2655BBFD1E1376F9004D3039 /* source.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,6 +263,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2655BBD51E136782004D3039 /* ViewController.m in Sources */,
+				2655BBFB1E1367D3004D3039 /* ExtAudioConverter.m in Sources */,
 				2655BBD21E136782004D3039 /* AppDelegate.m in Sources */,
 				2655BBCF1E136782004D3039 /* main.m in Sources */,
 			);
@@ -356,6 +404,10 @@
 				DEVELOPMENT_TEAM = M3FCT79SM9;
 				INFOPLIST_FILE = AudioConverter/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AudioConverter/lame/lib",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.smallsharptools.AudioConverter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -368,6 +420,10 @@
 				DEVELOPMENT_TEAM = M3FCT79SM9;
 				INFOPLIST_FILE = AudioConverter/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/AudioConverter/lame/lib",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.smallsharptools.AudioConverter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
