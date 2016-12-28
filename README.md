@@ -1,6 +1,6 @@
 # AudioConverter
 
-Integrates with LAME library for MP3 to support converting audio to MP3 format
+Integrates with LAME library to support converting audio to MP3 format
 in addition to the formats supported by iOS.
 
  * [ExtAudioFileConverter] (Original Source)
@@ -8,8 +8,8 @@ in addition to the formats supported by iOS.
 
 # How to Build
 
-First create the static libary for LAME using [LAME iOS Build]. Get the latest version 
-[LAME Download] and place the source in a folder named `lame` under the build folder.
+First create the static libary for LAME using [LAME iOS Build]. Get the latest 
+[LAME download] and place the source in a folder named `lame` under the build folder.
 Then run `build-lame.sh` which will create various static libraries for each of the
 supported architectures as well as FAT binaries which can be used for development.
 
@@ -27,15 +27,25 @@ and the new file is played immediately.
 
 # Release Builds
 
-Apps which are submitted to the App Store cannot include FAT binaries which include
-architectures used by the iOS Simulator. These are `x86_64` and `i386`. A tool like
-CocoaPods includes tools which strip out these architectures using the `lipo` tool.
-It is also possible to create `Debug` and `Release` static libaries with the required
-architectures based on the current build configuration.
+Running the script for [LAME iOS Build] creates a FAT binary which includes architectures
+for devices as well as the iOS Simulator. When a release build is submitted to the 
+App Store it will be rejected if architectures for the iOS Simulator are included source
+they must be excluded. Running the build script can be run again to build with the valid
+architures only. First the previous output folders must be deleted.
 
-Current `libmp3lame.a` is included directly in the project. It is possible to instead
-use a Library Search Path with the variable for the current build configuration to
-change Library Search Path for Debug or Release.
+```sh
+rm -rf fat-lame/
+rm -rf scratch-lame/
+rm -rf thin-lame/
+./build-lame.sh arm64 armv7s armv7
+```
+A tool like CocoaPods includes scripts which strip out these architectures using the 
+`lipo` tool. It is also possible to create `Debug` and `Release` static libaries with 
+the required architectures based on the current build configuration.
+
+NOTE: It is possible that current versions of Xcode will strip out the invalid architectures
+when the archive is created for submitting a build to the App Store, making this work
+unnecessary.
 
 # Source Audio
 
@@ -52,4 +62,4 @@ Any text can be converted to speech and stored in the output file.
 
 [ExtAudioFileConverter]: https://github.com/lixing123/ExtAudioFileConverter
 [LAME iOS Build]: https://github.com/kewlbear/lame-ios-build
-[LAME Download]: https://sourceforge.net/projects/lame/files/lame/3.99/
+[LAME download]: https://sourceforge.net/projects/lame/files/lame/3.99/

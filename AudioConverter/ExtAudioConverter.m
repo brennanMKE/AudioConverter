@@ -190,7 +190,7 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
                                             &settings.inputFile),
                         "ExtAudioFileOpenURL failed");
     if (status != ExtAudioConverterStatusOK) {
-        return false;
+        return NO;
     }
 
     if (![self validateInput:&settings]) {
@@ -223,7 +223,7 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
                                                    &settings.outputFormat),
                             "AudioFormatGetProperty kAudioFormatProperty_FormatInfo failed");
         if (status != ExtAudioConverterStatusOK) {
-            return false;
+            return NO;
         }
     }
     if (self.debugEnabled) {
@@ -245,7 +245,7 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
                                                       &settings.outputFile),
                             "Create output file failed, the output file type and output format pair may not match");
         if (status != ExtAudioConverterStatusOK) {
-            return false;
+            return NO;
         }
     }
 
@@ -275,7 +275,7 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
                                                 &settings.inputPCMFormat),
                         "Setting client data format of input file failed");
     if (status != ExtAudioConverterStatusOK) {
-        return false;
+        return NO;
     }
 
     //If the file has a client data format, then the audio data in ioData is translated from the client format to the file data format, via theExtAudioFile's internal AudioConverter.
@@ -286,20 +286,21 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
                                                     &settings.inputPCMFormat),
                             "Setting client data format of output file failed");
         if (status != ExtAudioConverterStatusOK) {
-            return false;
+            return NO;
         }
     }
 
+    BOOL result;
     if (settings.outputFormat.mFormatID==kAudioFormatMPEGLayer3) {
-        startConvertMP3(&settings);
+        result = startConvertMP3(&settings);
     } else {
-        startConvert(&settings);
+        result = startConvert(&settings);
     }
 
     ExtAudioFileDispose(settings.inputFile);
     //AudioFileClose/ExtAudioFileDispose function is needed, or else for .wav output file the duration will be 0
     ExtAudioFileDispose(settings.outputFile);
-    return YES;
+    return result;
 }
 
 // Check if the input combination is valid
