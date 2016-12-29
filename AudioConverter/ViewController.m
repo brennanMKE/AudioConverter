@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-#import "ExtAudioConverter.h"
+#import <AudioConverterKit/AudioConverterKit.h>
 
 #import <AVKit/AVKit.h>
 #import <AVFoundation/AVFoundation.h>

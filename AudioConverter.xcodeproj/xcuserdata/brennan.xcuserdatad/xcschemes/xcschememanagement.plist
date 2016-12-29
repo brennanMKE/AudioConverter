@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>AudioConverterKit.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
@@ -18,6 +23,16 @@
 			<true/>
 		</dict>
 		<key>2655BBE21E136783004D3039</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>26CB67D91E1576C900618052</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>26CB67E11E1576CA00618052</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -38,6 +38,16 @@
                ReferencedContainer = "container:AudioConverter.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "26CB67E11E1576CA00618052"
+               BuildableName = "AudioConverterKitTests.xctest"
+               BlueprintName = "AudioConverterKitTests"
+               ReferencedContainer = "container:AudioConverter.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

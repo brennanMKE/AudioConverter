@@ -1,4 +1,5 @@
-AudioConverter/lame/
+lame.h
+libmp3lame.a
 
 # Created by https://www.gitignore.io/api/xcode
 
