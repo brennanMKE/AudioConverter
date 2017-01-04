@@ -133,7 +133,7 @@ Boolean startConvertMP3(ExtAudioConverterSettings *settings) {
                outputBufferList.mBuffers[0].mData,
                framesCount);
 
-        if (framesCount < framesPerBuffer * channelsCount) {
+        if (framesCount == framesPerBuffer / channelsCount) {
             //the 3rd parameter means number of samples per channel, not number of sample in pcm_buffer
             write = lame_encode_buffer_interleaved(lame,
                                                    outputBufferList.mBuffers[0].mData,
